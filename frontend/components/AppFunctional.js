@@ -12,7 +12,7 @@ export default function AppFunctional(props) {
   const [index, setIndex] = useState(initial.index);
 
   function getXY(i) {
-    const coordinates = ['1,1','1,2','1,3','2,1','2,2','2,3','3,1','3,2','3,3']
+    const coordinates = ['1,1','2,1','3,1','1,2','2,2','3,2','1,3','2,3','3,3']
     return coordinates[i]
   }
 
@@ -72,7 +72,7 @@ export default function AppFunctional(props) {
     <div id="wrapper" className={props.className}>
       <div className="info">
         <h3 id="coordinates">{getXYMessage(index)}</h3>
-        <h3 id="steps">You moved {steps} times</h3>
+        <h3 id="steps">You moved {steps} time{steps === 1 ? `` : `s`}</h3>
       </div>
       <div id="grid">
         {

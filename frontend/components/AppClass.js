@@ -27,7 +27,7 @@ export default class AppClass extends React.Component {
   }
 
   getXY = (i) => {
-    const coordinates = ['1,1','1,2','1,3','2,1','2,2','2,3','3,1','3,2','3,3']
+    const coordinates = ['1,1','2,1','3,1','1,2','2,2','3,2','1,3','2,3','3,3']
     return coordinates[i]
   }
 
@@ -91,7 +91,7 @@ export default class AppClass extends React.Component {
       <div id="wrapper" className={className}>
         <div className="info">
           <h3 id="coordinates">{this.getXYMessage(this.state.index)}</h3>
-          <h3 id="steps">You moved {this.state.steps} times</h3>
+          <h3 id="steps">You moved {this.state.steps} time{this.state.steps === 1 ? `` : `s`}</h3>
         </div>
         <div id="grid">
           {
