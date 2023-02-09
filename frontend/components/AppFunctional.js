@@ -1,43 +1,60 @@
-import React from 'react'
+import React, { useState } from 'react'
+
 
 // Suggested initial states
-const initialMessage = ''
-const initialEmail = ''
-const initialSteps = 0
-const initialIndex = 4 // the index the "B" is at
+const initial = {message:'', email:'', steps:0, index:4}
 
 export default function AppFunctional(props) {
-  // THE FOLLOWING HELPERS ARE JUST RECOMMENDATIONS.
-  // You can delete them and build your own logic from scratch.
+  const [message, setMessage] = useState(initial.message);
+  const [email, setEmail] = useState(initial.email);
+  const [steps, setSteps] = useState(initial.steps);
+  const [index, setIndex] = useState(initial.index);
+  console.log(index)
 
-  function getXY() {
-    // It it not necessary to have a state to track the coordinates.
-    // It's enough to know what index the "B" is at, to be able to calculate them.
+  function getXY(i) {
+    const coordinates = ['1,1','1,2','1,3','2,1','2,2','2,3','3,1','3,2','3,3']
+    return coordinates[i]
   }
 
-  function getXYMessage() {
-    // It it not necessary to have a state to track the "Coordinates (2, 2)" message for the user.
-    // You can use the `getXY` helper above to obtain the coordinates, and then `getXYMessage`
-    // returns the fully constructed string.
+  function getXYMessage(i) {
+    return `Coordinates (${getXY(i)})`
   }
 
   function reset() {
-    // Use this helper to reset all states to their initial values.
+    setMessage(initial.message);
+    setEmail(initial.email);
+    setSteps(initial.steps);
+    setIndex(initial.index);
   }
 
-  function getNextIndex(direction) {
+  function getNextIndex(dir) {
     // This helper takes a direction ("left", "up", etc) and calculates what the next index
     // of the "B" would be. If the move is impossible because we are at the edge of the grid,
     // this helper should return the current index unchanged.
+    const dirs = {left: -1, right:1, up:-3, down:3}
+    const left = [0,3,6];
+    const right = [2, 5, 8];
+
+    const newInd = index + dirs[dir];
+    if (dir === 'left' &&  left.includes(index)) return index;
+    if (dir === 'right' &&  right.includes(index)) return index;
+    return newInd > -1 && newInd < 9 ? newInd : index;
   }
 
   function move(evt) {
     // This event handler can use the helper above to obtain a new index for the "B",
     // and change any states accordingly.
+    const newIndex = getNextIndex(evt.target.id)
+    if (newIndex !== index) {
+      setIndex(newIndex); 
+      setSteps(steps + 1);
+      setMessage(getXYMessage(index));
+    }
   }
 
   function onChange(evt) {
     // You will need this to update the value of the input.
+    setEmail(evt.target.value)
   }
 
   function onSubmit(evt) {
@@ -47,14 +64,14 @@ export default function AppFunctional(props) {
   return (
     <div id="wrapper" className={props.className}>
       <div className="info">
-        <h3 id="coordinates">Coordinates (2, 2)</h3>
-        <h3 id="steps">You moved 0 times</h3>
+        <h3 id="coordinates">{getXYMessage(index)}</h3>
+        <h3 id="steps">You moved {steps} times</h3>
       </div>
       <div id="grid">
         {
           [0, 1, 2, 3, 4, 5, 6, 7, 8].map(idx => (
-            <div key={idx} className={`square${idx === 4 ? ' active' : ''}`}>
-              {idx === 4 ? 'B' : null}
+            <div key={idx} className={`square${idx === index ? ' active' : ''}`}>
+              {idx === index ? 'B' : null}
             </div>
           ))
         }
@@ -63,14 +80,20 @@ export default function AppFunctional(props) {
         <h3 id="message"></h3>
       </div>
       <div id="keypad">
-        <button id="left">LEFT</button>
-        <button id="up">UP</button>
-        <button id="right">RIGHT</button>
-        <button id="down">DOWN</button>
-        <button id="reset">reset</button>
+        <button id="left" onClick={move}>LEFT</button>
+        <button id="up" onClick={move}>UP</button>
+        <button id="right" onClick={move}>RIGHT</button>
+        <button id="down" onClick={move}>DOWN</button>
+        <button id="reset" onClick={reset}>reset</button>
       </div>
       <form>
-        <input id="email" type="email" placeholder="type email"></input>
+        <input 
+          id="email" 
+          type="email" 
+          placeholder="type email" 
+          value={email}
+          onChange={onChange}
+        />
         <input id="submit" type="submit"></input>
       </form>
     </div>
