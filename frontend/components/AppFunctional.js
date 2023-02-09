@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import axios from 'axios'
 
 
 // Suggested initial states
@@ -9,7 +10,6 @@ export default function AppFunctional(props) {
   const [email, setEmail] = useState(initial.email);
   const [steps, setSteps] = useState(initial.steps);
   const [index, setIndex] = useState(initial.index);
-  console.log(index)
 
   function getXY(i) {
     const coordinates = ['1,1','1,2','1,3','2,1','2,2','2,3','3,1','3,2','3,3']
@@ -44,12 +44,12 @@ export default function AppFunctional(props) {
   function move(evt) {
     // This event handler can use the helper above to obtain a new index for the "B",
     // and change any states accordingly.
+    setMessage(initial.message)
     const newIndex = getNextIndex(evt.target.id)
     if (newIndex !== index) {
       setIndex(newIndex); 
       setSteps(steps + 1);
-      setMessage(getXYMessage(index));
-    }
+    } else setMessage(`You can't go ${evt.target.id}`)
   }
 
   function onChange(evt) {
@@ -58,7 +58,14 @@ export default function AppFunctional(props) {
   }
 
   function onSubmit(evt) {
+    evt.preventDefault();
+    const x = parseInt(getXY(index).substring(0,1))
+    const y = parseInt(getXY(index).substring(2))
     // Use a POST request to send a payload to the server.
+    axios.post('http://localhost:9000/api/result/', {email: email, x: x, y: y, steps: steps})
+      .then(res => setMessage(res.data.message))
+      .catch(err => setMessage(err.response.data.message))
+      .finally(setEmail(initial.email))
   }
 
   return (
@@ -77,7 +84,7 @@ export default function AppFunctional(props) {
         }
       </div>
       <div className="info">
-        <h3 id="message"></h3>
+        <h3 id="message">{message}</h3>
       </div>
       <div id="keypad">
         <button id="left" onClick={move}>LEFT</button>
@@ -86,7 +93,7 @@ export default function AppFunctional(props) {
         <button id="down" onClick={move}>DOWN</button>
         <button id="reset" onClick={reset}>reset</button>
       </div>
-      <form>
+      <form onSubmit={onSubmit}>
         <input 
           id="email" 
           type="email" 
